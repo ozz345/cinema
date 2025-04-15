@@ -12,7 +12,7 @@ const Subscription = () => {
 
 <>
 <div>
-<h1>Subscriptions</h1>
+<h1>Subscription</h1>
 <nav style={{
         backgroundColor: '#6743',
         padding: '1rem',
