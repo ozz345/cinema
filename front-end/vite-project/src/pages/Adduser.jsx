@@ -162,7 +162,7 @@ const Adduser = () => {
       <h1>Add User</h1>
 
       <form onSubmit={handleSubmit}>
-        First Name:{' '}
+        Firsts Name:{' '}
         <input
           type='text'
           value={permissions.firstname}
