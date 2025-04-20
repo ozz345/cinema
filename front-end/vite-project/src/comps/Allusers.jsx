@@ -1,37 +1,28 @@
-import React, { useState } from 'react';
-
-import { useNavigate } from 'react-router-dom';
-
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Outlet } from 'react-router-dom';
 import axios from 'axios';
 
 const Allusers = () => {
     const [users, setUsers] = useState([]);
     const [message, setMessage] = useState('');
-    // const [users_foredit, setUsers_foredit] = useState();
-    const navigate = useNavigate()
+    const [showUsersList, setShowUsersList] = useState(true);
+    const [searchTerm, setSearchTerm] = useState('');
+    const navigate = useNavigate();
     const BASE_URL = 'http://127.0.0.1:5000';
     const currentUsername = sessionStorage.username;
-
 
     const next = (user) => {
         sessionStorage.setItem('user', JSON.stringify(user));
         navigate('/edit_user/');
     };
 
-
-
-    const allusers = async () => {
+    const fetchUsers = async () => {
         try {
             const response = await axios.get('http://localhost:5000/get_all_users');
-            console.log('Full data:', response.data);
-
-            // Filter permissions for all users
             const filteredUsers = response.data.map(user => {
                 const filteredPermissions = Object.entries(user.permissions || {})
                     .filter(([_, value]) => value === true)
                     .reduce((acc, [key]) => ({ ...acc, [key]: true }), {});
-                    ;
-
 
                 return {
                     ...user,
@@ -40,14 +31,25 @@ const Allusers = () => {
             });
 
             setUsers(filteredUsers);
-
-            console.log(filteredUsers);
-
-
+            setShowUsersList(true);
         } catch (error) {
             console.error('Error fetching users:', error);
         }
     };
+
+    useEffect(() => {
+        fetchUsers();
+    }, []);
+
+    const handleSearch = (e) => {
+        setSearchTerm(e.target.value);
+    };
+
+    const handleAddUserClick = () => {
+        setShowUsersList(false);
+        navigate("/main_page/user-managemant/add-user");
+    };
+
     const deleteUser = async (userId) => {
         try {
             const response = await axios.delete(`${BASE_URL}/delete_user/${userId}`, {
@@ -57,11 +59,9 @@ const Allusers = () => {
                 withCredentials: true
             });
 
-            // Check the response message
             if (response.data.message === "deleted") {
                 setMessage("User deleted successfully!");
-                // Refresh the users list
-                allusers();
+                fetchUsers();
             } else if (response.data.message === "user not found") {
                 setMessage("User not found");
             } else {
@@ -69,7 +69,6 @@ const Allusers = () => {
             }
         } catch (error) {
             console.error('Error:', error);
-            // Check if it's a specific error from the backend
             if (error.response && error.response.data && error.response.data.message) {
                 setMessage(error.response.data.message);
             } else {
@@ -77,80 +76,108 @@ const Allusers = () => {
             }
         }
     };
+
+    const filteredUsers = users.filter(user =>
+        user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.firstname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.lastname.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     return (
-        <div style={{ textAlign: 'left' }}>
-            {message && <p style={{ color: message.includes("Error") ? "red" : "green" }}>{message}</p>}
-            <div>
+        <div className="users-container">
+            {message && <div className={`message ${message.includes("Error") ? 'error' : 'success'}`}>{message}</div>}
 
-                        <button style={{
-                            padding: '8px 16px',
-                            marginRight: '16px',
-                            backgroundColor: '#007bff',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                        }} onClick={allusers}>All Users</button>
-                                        {currentUsername === 'tret' && (
-                    <>
-                        <button style={{
-                            padding: '8px 16px',
-                            left: '80px',
-                            backgroundColor: '#28a745',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                        }} onClick={() => navigate("/add_user/")}>Add User</button>
-                    </>
-                )}
-                {users.map((user, index) => (
-                    <div key={user.id || index} style={{
-                        marginBottom: '50px',
-                        right: '80 px',
-                        padding: '25px',
-                        border: '1px solid #ccc',
-                        textAlign: 'left'
-                    }}>
-                        <h3 style={{ marginBottom: '10px' }}>Name: {user.firstname} {user.lastname}</h3>
-                        <p style={{ margin: '5px 0' }}>User Name: {user.username}</p>
-                        <p style={{ margin: '5px 0' }}>Session Timeout: {user.sessiontimeout}</p>
-                        <p style={{ margin: '5px 0' }}>Created Date: {user.createddate}</p>
-
-                        <div>
-                            <h4 style={{ marginBottom: '10px' }}>Active Permissions:</h4>
-                            <div style={{
-                                display: 'grid',
-                                gridTemplateColumns: 'repeat(3, 1fr)',
-                                flexWrap: 'wrap',
-                                gap: '8px',
-                                marginTop: '8px',
-                                justifyContent: 'flex-end'
-                            }}>
-                                {Object.keys(user.permissions || {}).map(permission => (
-                                    <span key={permission} style={{ backgroundColor: '#e9ecef', width: '150px', padding: '4px 12px', borderRadius: '16px', fontSize: '0.9em', color: '#495057' }}>
-                                        {permission}
-                                    </span>
-                                ))}
-                            </div> <br></br>
-                            {currentUsername === 'tret' && (
-                                <>
-                                    <button
-                                        onClick={() => next(user)}
-                                        style={{
-                                            padding: '8px 16px',
-                                            marginRight: '16px',
-                                            border: 'none',
-                                            borderRadius: '4px',
-                                        }}
-                                    >
-                                        Edit
-                                    </button>
-                                    <button onClick={() => deleteUser(user.id)} style={{ padding: '8px 16px', left: '80px', border: 'none', borderRadius: '4px', }}>Delete</button>
-                                </>
-                            )}
-                        </div>
+            <div className="users-header">
+                <div className="users-controls">
+                    <div className="search-box">
+                        <i className="fas fa-search"></i>
+                        <input
+                            type="text"
+                            placeholder="Search by username or name..."
+                            value={searchTerm}
+                            onChange={handleSearch}
+                            className="search-input"
+                        />
                     </div>
-                ))}
+
+                    <div className="action-buttons">
+                        <button onClick={fetchUsers} className="all-movies-button">
+                            <i className="fas fa-users"></i> All Users
+                        </button>
+                        {currentUsername === 'tret' && (
+                            <button onClick={handleAddUserClick} className="add-movie-button">
+                                <i className="fas fa-user-plus"></i> Add User
+                            </button>
+                        )}
+                    </div>
+                </div>
             </div>
+
+            {showUsersList && (
+                <div className="users-grid">
+                    {filteredUsers.length > 0 ? (
+                        filteredUsers.map((user) => (
+                            <div key={user.id} className="user-card">
+                                <div className="user-details">
+                                    <h2 className="user-title">{user.firstname} {user.lastname}</h2>
+                                    <div className="user-info">
+                                        <div className="info-item">
+                                            <i className="fas fa-user"></i>
+                                            <span>Username: {user.username}</span>
+                                        </div>
+                                        <div className="info-item">
+                                            <i className="fas fa-clock"></i>
+                                            <span>Session Timeout: {user.sessiontimeout}</span>
+                                        </div>
+                                        <div className="info-item">
+                                            <i className="fas fa-calendar"></i>
+                                            <span>Created Date: {user.createddate}</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="permissions-section">
+                                        <h3 className="section-title">
+                                            <i className="fas fa-key"></i> Active Permissions
+                                        </h3>
+                                        <div className="permissions-grid">
+                                            {Object.keys(user.permissions || {}).map(permission => (
+                                                <span key={permission} className="permission-tag">
+                                                    {permission}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {currentUsername === 'tret' && (
+                                        <div className="user-actions">
+                                            <button
+                                                onClick={() => next(user)}
+                                                className="action-button edit-button"
+                                                title="Edit User"
+                                            >
+                                                <i className="fas fa-edit"></i> Edit
+                                            </button>
+                                            <button
+                                                onClick={() => deleteUser(user.id)}
+                                                className="action-button delete-button"
+                                                title="Delete User"
+                                            >
+                                                <i className="fas fa-trash"></i> Delete
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <div className="no-results">
+                            <i className="fas fa-users"></i>
+                            <p>No users found matching your criteria</p>
+                        </div>
+                    )}
+                </div>
+            )}
+            {!showUsersList && <Outlet />}
         </div>
     );
 };

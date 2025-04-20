@@ -18,6 +18,7 @@ import Editmovie from './pages/Editmovie';
 import Addmovie from './pages/Addmovie';
 import Adduserfirstime from './pages/Adduserfirstime';
 import Edituser_without_prem from './pages/Edituser_without_prem';
+
 function App() {
   const dispatch = useDispatch();
 
@@ -47,15 +48,17 @@ function App() {
         <Route path="/add_user_firstime/" element={<Adduserfirstime />} />
         <Route path="/edituser_without_prem/" element={<Edituser_without_prem />} />
 
-
-
-
-
         {/* Nested Routing */}
         <Route path='/main_page' element={<Mainpage />}>
-          <Route path="user-managemant" element={<UsersManage />} />
-          <Route path="subscription" element={<Subscription />} />
-          <Route path="movies" element={<Movies />} />
+          <Route path="user-managemant" element={<UsersManage />}>
+            <Route path="add-user" element={<Adduser />} />
+          </Route>
+          <Route path="subscription" element={<Subscription />}>
+            <Route path="add-member" element={<Addmember />} />
+          </Route>
+          <Route path="movies" element={<Movies />}>
+            <Route path="add-movie" element={<Addmovie />} />
+          </Route>
         </Route>
       </Routes>
     </>
