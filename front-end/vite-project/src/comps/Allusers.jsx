@@ -183,7 +183,3 @@ const Allusers = () => {
 };
 
 export default Allusers;
-
-
-
-

@@ -7,8 +7,9 @@ from routers.subscriptions__router import (add_member_bp, delete_mem,
                                            members_bp, update_mem)
 from routers.Users_router import (add_user_premissions, add_users,
                                   create_account, delete_user_by_id,
-                                  get_all_users, login_page,
-                                  update_premission_by_id, update_user_by_id, get_all_usersnames)
+                                  get_all_users, get_all_usersnames,
+                                  login_page, update_premission_by_id,
+                                  update_user_by_id)
 from routers.watched_movies_router import watched_movies_bp
 
 
@@ -25,7 +26,7 @@ app = Flask(__name__)
 # Configure CORS with specific origin and methods
 CORS(app, resources={
     r"/*": {
-        "origins": ["http://localhost:5173"],
+        "origins": ["http://localhost:5173", "https://cinema-dxea.vercel.app"],
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization"],
         "supports_credentials": True

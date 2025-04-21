@@ -183,11 +183,11 @@ const Allsubscriptions = () => {
                                     <h2 className="member-title">{subscription.name}</h2>
                                     <div className="member-info">
                                         <div className="info-item">
-                                            <i className="fas fa-envelope"></i>
+                                            <i className="fas fa-envelope">Email:</i>
                                             <span>{subscription.email}</span>
                                         </div>
                                         <div className="info-item">
-                                            <i className="fas fa-city"></i>
+                                            <i className="fas fa-city">City:</i>
                                             <span>{subscription.city}</span>
                                         </div>
                                     </div>
@@ -236,7 +236,3 @@ const Allsubscriptions = () => {
 };
 
 export default Allsubscriptions;
-
-
-
-

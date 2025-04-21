@@ -40,7 +40,7 @@ def add_user():
         print(f"Error adding permissions: {str(e)}")
         return jsonify({"message": "Error adding permissions"}), 500
 
-@get_all_users.route("/", methods=["GET"])
+@get_all_users.route("/", methods=["GET", 'OPTIONS'], strict_slashes=False )
 def get_all_users_route():
     users = users_service.get_all_users()
     return jsonify(users)
