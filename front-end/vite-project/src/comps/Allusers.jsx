@@ -93,7 +93,7 @@ const Allusers = () => {
                         <i className="fas fa-search"></i>
                         <input
                             type="text"
-                            placeholder="Search by username or name..."
+                            placeholder="Search..."
                             value={searchTerm}
                             onChange={handleSearch}
                             className="search-input"

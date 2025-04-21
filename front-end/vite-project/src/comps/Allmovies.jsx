@@ -165,7 +165,7 @@ const Allmovies = () => {
                             <i className="fas fa-search"></i>
                             <input
                                 type="text"
-                                placeholder="Search by name.."
+                                placeholder="Search.."
                                 value={searchTerm}
                                 onChange={handleSearch}
                                 className="search-input"
@@ -183,6 +183,10 @@ const Allmovies = () => {
                             </select>
                         </div>
                     </div>
+
+
+
+
                     <div className="action-buttons">
                         <button onClick={handleAllMovies} className="action-button all-movies-button">
                             <i className="fas fa-film"></i> All Movies
